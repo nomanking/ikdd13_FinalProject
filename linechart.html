@@ -1,0 +1,266 @@
+﻿
+<!DOCTYPE html>
+<html>
+<head>
+    <title>歷年各縣市吸菸率--折線圖</title>
+    <script type="text/javascript" src="d3.js"></script>
+	<meta charset="utf-8">
+    	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    	<meta name="description" content="">
+   		<meta name="author" content="">
+
+    	<!-- Bootstrap core CSS -->
+    	<link href="css/bootstrap.css" rel="stylesheet">
+
+   		<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    	<!--[if lt IE 9]>
+      	<script src="../../assets/js/html5shiv.js"></script>
+      	<script src="../../assets/js/respond.min.js"></script>
+    	<![endif]-->
+
+    	<!-- Custom styles for this template -->
+    	<link href="css/dount.css" rel="stylesheet">
+</head>
+<style type="text/css">
+    body{
+        height: 100%;
+        
+    }
+	.title{font-family:Arial,微軟雅黑;font-size:18px;text-anchor:middle;}
+	.subTitle{font-family:Arial,宋體;font-size:12px;text-anchor:middle;fill:#666}
+    .axis path,
+    .axis line {
+        fill: none;
+        stroke: black;
+        shape-rendering: crispEdges;
+    }
+
+    .axis text {
+        font-family: sans-serif;
+        font-size: 20px;
+		fill:#999;
+    }
+</style>
+<body >
+<!-- 目錄
+	================================================== -->
+     <div class="navbar-wrapper">
+      <div class="container">
+
+        <div class="navbar navbar-inverse navbar-static-top">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="index.html">IDKK13</a>
+            </div>
+            <div class="navbar-collapse collapse">
+              <ul class="nav navbar-nav">
+                <li class="active"><a href="index.html">Home</a></li>
+                <li><a href="dount.html">歷年各縣市吸菸年齡層分布-圓餅圖</a></li>
+                <li><a href="groupchart.html">歷年各縣市吸菸年齡層分布-長條圖</a></li>
+				<li><a href="linechart.html">歷年各縣市吸菸率-折線圖</a></li>
+				<li><a href="renderchart.html">歷年各縣市吸菸率-長條圖v2</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Jumbotron
+    ================================================== -->
+<div class="jumbotron">
+			<h1>歷年各縣市吸菸人口率-折線圖</h1>
+				請選擇縣市<select id="menu"></select>
+		</div>
+<div id="linechart" style="text-align:center"></div>>
+
+<script type="text/javascript">
+function drawLineChart(selected){
+var index=selected;
+if (typeof selected == 'undefined') {
+    var rs = d3.select('#menu').node();
+    index = rs.options[rs.selectedIndex].value;
+  }
+d3.csv("test.csv",function(csvdata){
+	
+	var dataset=[];	
+	var xMarks=[];
+	var w=800;
+	var h=600;
+	var padding=60;
+
+	var head_height=padding;
+	
+	
+	var foot_height=padding;
+	var city;
+	getData();	
+	var title=city+"吸菸人口率";
+	//定??布
+	
+	d3.select("svg").remove();
+	
+	var svg=d3.select("#linechart")
+	.append("svg")
+	.attr("width",w)
+	.attr("height",h);
+	
+	//添加背景
+	svg.append("g")
+	.append("rect")
+	.attr("x",0)
+	.attr("y",0)
+	.attr("width",w)
+	.attr("height",h)
+	.style("fill","#FFF")
+	.style("stroke-width",2)
+	.style("stroke","#E7E7E7");	
+	
+	//添加標題
+	if(title!="")
+	{
+		svg.append("g")
+		.append("text")
+		.text(title)
+		.attr("class","title")
+		.attr("x",w/2)
+		.attr("y",head_height);		
+		head_height+=30;
+	}
+	
+
+	
+	//?坐??比例尺	
+	var xScale = d3.scale.linear()
+		.domain([0,dataset.length-1])
+		.range([padding,w-padding]);	
+		
+	//?坐??比例尺
+	var yScale = d3.scale.linear()
+		.domain([0,d3.max(dataset)])
+		.range([h-foot_height,head_height]);
+	
+	//定???
+	var xAxis = d3.svg.axis()
+            .scale(xScale)	
+            .orient("bottom").ticks(dataset.length);
+			
+	//添加?坐??并通????取??的????
+    var xBar=svg.append("g")
+            .attr("class", "axis")
+            .attr("transform", "translate(0," + (h - padding) + ")")
+            .call(xAxis)
+			.selectAll("text")
+				.text(function(d){return xMarks[d];});	
+	
+	//定???
+	var yAxis = d3.svg.axis()
+            .scale(yScale)
+            .orient("left").ticks(15).tickFormat(function(d){return d+'%';});;
+
+	//添加??
+    var yBar=svg.append("g")
+			.attr("class", "axis")
+			.attr("transform", "translate("+padding+",0)")
+			.call(yAxis);		 	
+	
+	//添加折?
+	var line = d3.svg.line()
+		.x(function(d,i){return xScale(i);})
+        .y(function(d){return yScale(d);});
+	
+	var path=svg.append("path")
+        .attr("d", line(dataset))
+		.style("fill","#F00")
+		.style("fill","none")
+		.style("stroke-width",2)
+		.style("stroke","#09F")
+		.style("stroke-opacity",0.9);
+	
+	//添加系列的小??
+	svg.selectAll("circle")
+	.data(dataset)
+	.enter()
+	.append("circle")
+	.attr("cx", function(d,i) {
+			return xScale(i);
+	})  
+	.attr("cy", function(d) {
+			return yScale(d);  
+	})  
+	.attr("r",5)
+	.attr("fill","#09F");			
+	
+	//重新作?
+	function drawChart()
+	{
+		getData();
+		
+		yBar.transition().duration(1000).call(yAxis);
+			
+		//???据更新
+		yScale = d3.scale.linear()
+		.domain([0,d3.max(dataset)])
+		.range([h-padding,head_height]);
+		
+		//重?路?
+		path.transition().duration(1000).attr("d", line(dataset));
+		
+		//重?4??
+		svg.selectAll("circle")
+		.data(dataset)
+		.transition()
+        .duration(1000)
+		.attr("cx", function(d,i) {				
+				return xScale(i);
+		})  
+		.attr("cy", function(d) {
+				return yScale(d);  
+		})
+	}
+	
+	function getData()
+	{		
+		dataset=[];
+		xMarks=[];
+		var a=0;
+		for ( j = 0 ;   j < csvdata. length ;   j ++   ) {  
+				if(csvdata[j]["城市"]==index)
+					a=j;
+		 }
+		console . log (csvdata[a]["城市"]) ;
+		var first   =   csvdata [ a ];
+		var label= Object.keys(first);
+		city=first[ label[0]];
+		for ( j = 1 ;   j < label. length ;   j ++   ) {  
+				dataset.push( first[ label[j]]);
+				xMarks.push(label[j]);
+		 }
+	}		
+	
+}
+);
+}
+
+function menu(){
+d3.csv("test.csv",function(csvdata){
+		var menu=d3.select("#menu");
+		for ( j = 0 ;   j < csvdata. length ;   j ++   ) {  
+				var name=csvdata[j]["城市"];
+				menu.append("option").attr("value",name).text(name); 
+		 }
+		d3.select('#menu').on('change', drawLineChart);
+		 var defaultTarget = '台南市';
+		d3.select('#menu').property('value', defaultTarget);
+		drawLineChart(defaultTarget);
+	}
+);
+}
+menu();
+</script>
+</body>
+</html>

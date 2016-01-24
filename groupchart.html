@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html >
+	<head>
+		<meta charset="utf-8">
+    	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    	<meta name="description" content="">
+   		<meta name="author" content="">
+
+    	<title>歷年各縣市吸菸年齡層分布-長條圖</title>
+
+    	<!-- Bootstrap core CSS -->
+    	<link href="css/bootstrap.css" rel="stylesheet">
+
+   		<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    	<!--[if lt IE 9]>
+      	<script src="../../assets/js/html5shiv.js"></script>
+      	<script src="../../assets/js/respond.min.js"></script>
+    	<![endif]-->
+
+    	<!-- Custom styles for this template -->
+    	<link href="css/dount.css" rel="stylesheet">
+
+		<script>
+			function setURL(loc) {
+    			document.getElementById('calendar').src = loc;
+  			}
+		</script>
+	</head>
+
+	<body>
+	<!-- 目錄
+	================================================== -->
+   <div class="navbar-wrapper">
+      <div class="container">
+
+        <div class="navbar navbar-inverse navbar-static-top">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="index.html">IDKK13</a>
+            </div>
+            <div class="navbar-collapse collapse">
+              <ul class="nav navbar-nav">
+                <li class="active"><a href="index.html">Home</a></li>
+                <li><a href="dount.html">歷年各縣市吸菸年齡層分布-圓餅圖</a></li>
+                <li><a href="groupchart.html">歷年各縣市吸菸年齡層分布-長條圖</a></li>
+				<li><a href="linechart.html">歷年各縣市吸菸率-折線圖</a></li>
+				<li><a href="renderchart.html">歷年各縣市吸菸率-長條圖v2</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Jumbotron
+    ================================================== -->
+		<div class="jumbotron">
+			<h1>歷年各縣市吸菸年齡層分布-長條圖</h1>
+  
+			<p>
+        		<a href="d3_groupchart.html?data98.csv" target="iframe">98年</a>&nbsp;&nbsp;&nbsp;
+        		<a href="d3_groupchart.html?data99.csv" target="iframe">99年</a>&nbsp;&nbsp;&nbsp;
+        		<a href="d3_groupchart.html?data100.csv" target="iframe">100年</a>&nbsp;&nbsp;
+        		<a href="d3_groupchart.html?data101.csv" target="iframe">101年</a>&nbsp;&nbsp;
+        		<a href="d3_groupchart.html?data102.csv" target="iframe">102年</a>&nbsp;&nbsp;
+        		<a href="d3_groupchart.html?data103.csv" target="iframe">103年</a>
+      		</p>
+
+			<iframe name="iframe" width=90% height=1000 src="about:blank"  marginwidth="0" marginheight="0" scrolling="no" frameborder="0"></iframe>
+		</div>
+		<script src="js/jquery.js"></script>
+    	<script src="js/bootstrap.min.js"></script>
+	</body>
+</htm>

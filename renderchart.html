@@ -1,0 +1,205 @@
+﻿
+<!DOCTYPE html>
+<html>
+<head>
+    <title>歷年各縣市吸菸率--折線圖</title>
+    <script type="text/javascript" src="d3.js"></script>
+	<meta charset="utf-8">
+    	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    	<meta name="description" content="">
+   		<meta name="author" content="">
+
+    	<!-- Bootstrap core CSS -->
+    	<link href="css/bootstrap.css" rel="stylesheet">
+
+   		<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    	<!--[if lt IE 9]>
+      	<script src="../../assets/js/html5shiv.js"></script>
+      	<script src="../../assets/js/respond.min.js"></script>
+    	<![endif]-->
+
+    	<!-- Custom styles for this template -->
+    	<link href="css/dount.css" rel="stylesheet">
+</head>
+<style type="text/css">
+    body{
+        height: 100%;
+        
+    }
+	.title{font-family:Arial,微軟雅黑;font-size:18px;text-anchor:middle;}
+	.subTitle{font-family:Arial,宋體;font-size:12px;text-anchor:middle;fill:#666}
+    .axis path,
+    .axis line {
+        fill: none;
+        stroke: black;
+        shape-rendering: crispEdges;
+    }
+
+    .axis text {
+        font-family: sans-serif;
+        font-size: 20px;
+		fill:#999;
+    }
+</style>
+<body >
+<!-- 目錄
+	================================================== -->
+      <div class="navbar-wrapper">
+      <div class="container">
+
+        <div class="navbar navbar-inverse navbar-static-top">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="index.html">IDKK13</a>
+            </div>
+            <div class="navbar-collapse collapse">
+              <ul class="nav navbar-nav">
+                <li class="active"><a href="index.html">Home</a></li>
+                <li><a href="dount.html">歷年各縣市吸菸年齡層分布-圓餅圖</a></li>
+                <li><a href="groupchart.html">歷年各縣市吸菸年齡層分布-長條圖</a></li>
+				<li><a href="linechart.html">歷年各縣市吸菸率-折線圖</a></li>
+				<li><a href="renderchart.html">歷年各縣市吸菸率-長條圖v2</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Jumbotron
+    ================================================== -->
+<div class="jumbotron">
+			<h1>歷年各縣市吸菸人口率-長條圖ver2</h1>
+				請選擇年份<select id="menu"></select>
+				<p>排序<input type="checkbox" id="check">
+				<div id="chart" style="text-align:center"></div>
+		</div>
+
+<script type="text/javascript">
+function renderChart(year) {
+//var data = d3.csv.parse(d3.select('#csv').text());
+if (typeof selected == 'undefined') {
+    var rs = d3.select('#menu').node();
+    index = rs.options[rs.selectedIndex].value;
+	year= parseInt(index);
+ }
+ 
+   var rs = d3.select('#check').node();
+ var control=(rs.checked)?1:0;
+ console.log(year,control);
+d3.csv("test.csv", function(data) {
+console.log(data);
+var valueLabelWidth = 50; // space reserved for value labels (right)
+var barHeight = 30; // height of one bar
+var barLabelWidth = 100; // space reserved for bar labels
+var barLabelPadding = 10; // padding between bar and bar labels (left)
+var gridLabelHeight = 20; // space reserved for gridline labels
+var gridChartOffset = 3; // space between start of grid and first bar
+var maxBarWidth = 400; // width of the bar with the max value
+
+// accessor functions 
+var barLabel = function(d) { return d['城市']; };
+var barValue = function(d) { return parseFloat(d[year+'年']); };
+
+d3.select('#chart').html("");
+d3.select('#chart').append("p").text(year+"年各縣市吸菸人口率:"); 
+// sorting
+var sortedData=data;
+var middle= parseFloat(sortedData[sortedData.length-1][year+'年']);
+console.log(sortedData[sortedData.length-1]['城市'],sortedData[sortedData.length-1][year+'年']);
+
+if(control=='1'){
+sortedData = data.sort(function(a, b) {
+ return d3.descending(barValue(a), barValue(b));
+});} 
+// scales
+var yScale = d3.scale.ordinal().domain(d3.range(0, sortedData.length)).rangeBands([0, sortedData.length * barHeight]);
+var y = function(d, i) { return yScale(i); };
+var yText = function(d, i) { return y(d, i) + yScale.rangeBand() / 2; };
+var x = d3.scale.linear().domain([0, d3.max(sortedData, barValue)]).range([0, maxBarWidth]);
+// svg container element
+var chart = d3.select('#chart').append("svg")
+  .attr('width', maxBarWidth + barLabelWidth + valueLabelWidth)
+  .attr('height', gridLabelHeight + gridChartOffset + sortedData.length * barHeight);
+// grid line labels
+var gridContainer = chart.append('g')
+  .attr('transform', 'translate(' + barLabelWidth + ',' + gridLabelHeight + ')'); 
+gridContainer.selectAll("text").data(x.ticks(10)).enter().append("text")
+  .attr("x", x)
+  .attr("dy", -3)
+  .attr("text-anchor", "middle")
+  .text(String);
+// vertical grid lines
+gridContainer.selectAll("line").data(x.ticks(10)).enter().append("line")
+  .attr("x1", x)
+  .attr("x2", x)
+  .attr("y1", 0)
+  .attr("y2", yScale.rangeExtent()[1] + gridChartOffset)
+  .style("stroke", "#ccc");
+// bar labels
+var labelsContainer = chart.append('g')
+  .attr('transform', 'translate(' + (barLabelWidth - barLabelPadding) + ',' + (gridLabelHeight + gridChartOffset) + ')'); 
+labelsContainer.selectAll('text').data(sortedData).enter().append('text')
+  .attr('y', yText)
+  .attr('stroke', 'none')
+  .attr('fill', 'black')
+  .attr("dy", ".35em") // vertical-align: middle
+  .attr('text-anchor', 'end')
+  .text(barLabel);
+// bars
+var barsContainer = chart.append('g')
+  .attr('transform', 'translate(' + barLabelWidth + ',' + (gridLabelHeight + gridChartOffset) + ')'); 
+barsContainer.selectAll("rect").data(sortedData).enter().append("rect")
+  .attr('y', y)
+  .attr('height', yScale.rangeBand())
+  .attr('width', function(d) { return x(barValue(d)); })
+  .attr('stroke', 'white')
+  .attr('fill', function(d) {
+				if (barValue(d)< middle) return "LightBlue";
+				else if(barValue(d)== middle) return "green"
+				else return "blue";
+  });
+// bar value labels
+barsContainer.selectAll("text").data(sortedData).enter().append("text")
+  .attr("x", function(d) { return x(barValue(d)); })
+  .attr("y", yText)
+  .attr("dx", 3) // padding-left
+  .attr("dy", ".35em") // vertical-align: middle
+  .attr("text-anchor", "start") // text-align: right
+  .attr("fill", "black")
+  .attr("stroke", "none")
+  .text(function(d) { return d3.round(barValue(d), 2)+'%'; });
+// start line
+barsContainer.append("line")
+  .attr("y1", -gridChartOffset)
+  .attr("y2", yScale.rangeExtent()[1] + gridChartOffset)
+  .style("stroke", "#000");
+  
+});
+}
+    
+	
+function menu(){
+d3.csv("test.csv",function(csvdata){
+		var menu=d3.select("#menu");
+		var key=Object.keys(csvdata [ 1 ]);
+		for ( j = 1 ;   j < key. length ;   j ++   ) {  
+				menu.append("option").attr("value",key[j]).text(key[j]); 
+		 }
+		
+		d3.select('#menu').on('change', renderChart);
+		d3.select('#check').on('change', renderChart);
+		var defaultTarget = 96;
+		d3.select('#menu').property('value', defaultTarget);
+		renderChart(defaultTarget,1);
+	}
+);
+}
+menu();
+</script>
+</body>
+</html>
